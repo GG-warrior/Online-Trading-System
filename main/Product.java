@@ -10,10 +10,12 @@ public class Product implements Serializable {
     private double price;
     private String ownerId;  // 商品所有者ID
     private boolean isPublished;  // 是否已发布
+    private boolean isBannedByAdmin;  // 是否被管理员封禁
     
     // 默认构造函数
     public Product() {
         this.isPublished = false;
+        this.isBannedByAdmin = false;
     }
     
     // 构造函数
@@ -24,6 +26,7 @@ public class Product implements Serializable {
         this.price = price;
         this.ownerId = ownerId;
         this.isPublished = false;
+        this.isBannedByAdmin = false;
     }
     
     // Getter和Setter方法
@@ -75,6 +78,14 @@ public class Product implements Serializable {
         isPublished = published;
     }
     
+    public boolean isBannedByAdmin() {
+        return isBannedByAdmin;
+    }
+    
+    public void setBannedByAdmin(boolean bannedByAdmin) {
+        isBannedByAdmin = bannedByAdmin;
+    }
+    
     @Override
     public String toString() {
         return "Product{" +
@@ -83,6 +94,7 @@ public class Product implements Serializable {
                 ", price=" + price +
                 ", ownerId='" + ownerId + '\'' +
                 ", isPublished=" + isPublished +
+                ", isBannedByAdmin=" + isBannedByAdmin +
                 '}';
     }
 }

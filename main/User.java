@@ -99,30 +99,9 @@ public class User implements Serializable {
         this.phoneNumber = phoneNumber;
     }
     
-    // 验证密码强度
-    public static boolean isPasswordStrong(String password) {
-        // 密码至少8位，包含数字和字母
-        if (password == null || password.length() < 8) {
-            return false;
-        }
-        return password.matches(".*[0-9].*") && password.matches(".*[a-zA-Z].*");
-    }
-    
-    // 验证邮箱格式
-    public static boolean isValidEmail(String email) {
-        if (email == null) return false;
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-    }
-    
-    // 验证手机号格式
-    public static boolean isValidPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) return false;
-        return phoneNumber.matches("^1[3-9]\\d{9}$");
-    }
-    
     // 修改密码
     public boolean changePassword(String oldPassword, String newPassword) {
-        if (this.password != null && this.password.equals(oldPassword) && isPasswordStrong(newPassword)) {
+        if (this.password != null && this.password.equals(oldPassword)) {
             this.password = newPassword;
             return true;
         }
@@ -133,8 +112,7 @@ public class User implements Serializable {
     public boolean isValid() {
         return userId != null && !userId.isEmpty() &&
                username != null && !username.isEmpty() &&
-               password != null && !password.isEmpty() &&
-               isPasswordStrong(password);
+               password != null && !password.isEmpty();
     }
     
     // 获取用户联系信息

@@ -37,10 +37,10 @@ public class ProductService {
         return true;
     }
     
-    // 发布商品
-    public boolean publishProduct(String productId) {
+    // 发布商品 - 修改为只有商品所有者才能发布，且未被管理员封禁的商品才能发布
+    public boolean publishProduct(String productId, String ownerId) {
         Product product = products.get(productId);
-        if (product != null && !product.isPublished()) {
+        if (product != null && !product.isPublished() && product.getOwnerId().equals(ownerId) && !product.isBannedByAdmin()) {
             product.setPublished(true);
             publishedProducts.computeIfAbsent("published", k -> new ArrayList<>()).add(productId);
             saveProductsToFile();
@@ -50,9 +50,9 @@ public class ProductService {
     }
     
     // 下架商品
-    public boolean unpublishProduct(String productId) {
+    public boolean unpublishProduct(String productId, String ownerId) {
         Product product = products.get(productId);
-        if (product != null && product.isPublished()) {
+        if (product != null && product.isPublished() && product.getOwnerId().equals(ownerId)) {
             product.setPublished(false);
             List<String> publishedList = publishedProducts.get("published");
             if (publishedList != null) {
@@ -64,10 +64,42 @@ public class ProductService {
         return false;
     }
     
-    // 删除商品
-    public boolean deleteProduct(String productId) {
-        Product product = products.remove(productId);
+    // 管理员封禁商品
+    public boolean banProductByAdmin(String productId) {
+        Product product = products.get(productId);
         if (product != null) {
+            product.setBannedByAdmin(true);
+            // 如果商品已发布，则同时下架
+            if (product.isPublished()) {
+                product.setPublished(false);
+                List<String> publishedList = publishedProducts.get("published");
+                if (publishedList != null) {
+                    publishedList.remove(productId);
+                }
+            }
+            saveProductsToFile();
+            return true;
+        }
+        return false;
+    }
+    
+    // 管理员解禁商品
+    public boolean unbanProductByAdmin(String productId) {
+        Product product = products.get(productId);
+        if (product != null && product.isBannedByAdmin()) {
+            product.setBannedByAdmin(false);
+            saveProductsToFile();
+            return true;
+        }
+        return false;
+    }
+    
+    // 删除商品
+    public boolean deleteProduct(String productId, String ownerId) {
+        Product product = products.get(productId);
+        if (product != null && product.getOwnerId().equals(ownerId)) {
+            products.remove(productId);
+            
             // 从用户商品列表中移除
             List<String> userProductList = userProducts.get(product.getOwnerId());
             if (userProductList != null) {
@@ -98,8 +130,8 @@ public class ProductService {
         if (publishedIds != null) {
             for (String productId : publishedIds) {
                 Product product = products.get(productId);
-                // 确保商品存在且已发布
-                if (product != null && product.isPublished() && 
+                // 确保商品存在且已发布且未被管理员封禁
+                if (product != null && product.isPublished() && !product.isBannedByAdmin() &&
                     product.getName().toLowerCase().contains(name.toLowerCase())) {
                     result.add(product);
                 }
@@ -130,7 +162,7 @@ public class ProductService {
         if (publishedIds != null) {
             for (String productId : publishedIds) {
                 Product product = products.get(productId);
-                if (product != null && product.isPublished()) {
+                if (product != null && product.isPublished() && !product.isBannedByAdmin()) {
                     result.add(product);
                 }
             }

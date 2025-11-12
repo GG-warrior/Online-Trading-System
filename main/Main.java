@@ -2,7 +2,7 @@ package main;
 
 import service.UserService;
 import service.ProductService;
-import service.TransactionService;
+import service.ContactExchangeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.InputMismatchException;
 public class Main {
     private static UserService userService = new UserService();
     private static ProductService productService = new ProductService();
-    private static TransactionService transactionService = new TransactionService();
+    private static ContactExchangeService contactExchangeService = new ContactExchangeService();
     private static Scanner scanner = new Scanner(System.in);
     private static User currentUser = null;
     
@@ -92,19 +92,19 @@ public class Main {
     private static void showRegularUserMenu() {
         System.out.println("3. 创建商品");
         System.out.println("4. 发布商品");
-        System.out.println("5. 查看我的商品");
-        System.out.println("6. 搜索商品");
-        System.out.println("7. 获取卖家联系方式");
-        System.out.println("8. 搜索用户");
-        System.out.println("9. 查看交易记录");
+        System.out.println("5. 下架商品");
+        System.out.println("6. 查看我的商品");
+        System.out.println("7. 搜索商品");
+        System.out.println("8. 获取卖家联系方式");
+        System.out.println("9. 搜索用户");
+        System.out.println("10. 查看联系方式交换记录");
     }
     
     private static void showAdminUserMenu() {
         System.out.println("3. 管理用户");
         System.out.println("4. 管理商品");
-        System.out.println("5. 查看系统报告");
-        System.out.println("6. 查看所有用户");
-        System.out.println("7. 查看所有商品");
+        System.out.println("5. 查看所有用户");
+        System.out.println("6. 查看所有商品");
     }
     
     private static void handleMainMenuChoice(int choice) {
@@ -137,19 +137,22 @@ public class Main {
                 publishProduct();
                 break;
             case 5:
-                viewMyProducts();
+                unpublishProduct();
                 break;
             case 6:
-                searchProducts();
+                viewMyProducts();
                 break;
             case 7:
-                getSellerContactInfo();
+                searchProducts();
                 break;
             case 8:
-                searchUsers();
+                getSellerContactInfo();
                 break;
             case 9:
-                viewTransactionHistory();
+                searchUsers();
+                break;
+            case 10:
+                viewContactExchangeHistory();
                 break;
             default:
                 System.out.println("无效选择");
@@ -162,20 +165,10 @@ public class Main {
             case 3:
                 System.out.print("请输入用户ID: ");
                 String userId = scanner.nextLine();
-                System.out.print("请输入操作 (manage/delete/ban/unban): ");
+                System.out.print("请输入操作 (ban/unban): ");
                 String action = scanner.nextLine();
                 
                 switch (action.toLowerCase()) {
-                    case "manage":
-                        admin.manageUser(userId, action);
-                        break;
-                    case "delete":
-                        if (userService.deleteUser(userId)) {
-                            System.out.println("用户删除成功");
-                        } else {
-                            System.out.println("用户删除失败，用户不存在");
-                        }
-                        break;
                     case "ban":
                         if (userService.banUser(userId)) {
                             System.out.println("用户封禁成功");
@@ -197,17 +190,32 @@ public class Main {
             case 4:
                 System.out.print("请输入商品ID: ");
                 String productId = scanner.nextLine();
-                System.out.print("请输入操作 (manage/delete): ");
+                System.out.print("请输入操作 (ban/unban): ");
                 String productAction = scanner.nextLine();
-                admin.manageProduct(productId, productAction);
+                
+                switch (productAction.toLowerCase()) {
+                    case "ban":
+                        if (productService.banProductByAdmin(productId)) {
+                            System.out.println("商品封禁成功");
+                        } else {
+                            System.out.println("商品封禁失败，商品不存在");
+                        }
+                        break;
+                    case "unban":
+                        if (productService.unbanProductByAdmin(productId)) {
+                            System.out.println("商品解禁成功");
+                        } else {
+                            System.out.println("商品解禁失败，商品不存在或未被封禁");
+                        }
+                        break;
+                    default:
+                        System.out.println("无效操作");
+                }
                 break;
             case 5:
-                admin.viewSystemReport();
-                break;
-            case 6:
                 viewAllUsers();
                 break;
-            case 7:
+            case 6:
                 viewAllProducts();
                 break;
             default:
@@ -300,10 +308,23 @@ public class Main {
         System.out.print("请输入要发布的商品ID: ");
         String productId = scanner.nextLine();
         
-        if (productService.publishProduct(productId)) {
+        RegularUser user = (RegularUser) currentUser;
+        if (productService.publishProduct(productId, user.getUserId())) {
             System.out.println("商品发布成功！");
         } else {
-            System.out.println("商品发布失败，请检查商品ID");
+            System.out.println("商品发布失败，请检查商品ID或确认您是该商品的所有者");
+        }
+    }
+
+    private static void unpublishProduct() {
+        System.out.print("请输入要下架的商品ID: ");
+        String productId = scanner.nextLine();
+        
+        RegularUser user = (RegularUser) currentUser;
+        if (productService.unpublishProduct(productId, user.getUserId())) {
+            System.out.println("商品下架成功！");
+        } else {
+            System.out.println("商品下架失败，请检查商品ID或确认您是该商品的所有者且商品已发布");
         }
     }
     
@@ -336,15 +357,15 @@ public class Main {
         }
     }
     
-    private static void viewTransactionHistory() {
-        List<Transaction> transactions = transactionService.getUserTransactions(currentUser.getUserId());
+    private static void viewContactExchangeHistory() {
+        List<ContactExchangeRecord> records = contactExchangeService.getUserExchangeRecords(currentUser.getUserId());
         
-        if (transactions.isEmpty()) {
-            System.out.println("您还没有任何交易记录");
+        if (records.isEmpty()) {
+            System.out.println("您还没有任何联系方式交换记录");
         } else {
-            System.out.println("您的交易记录:");
-            for (Transaction transaction : transactions) {
-                System.out.println(transaction.toString());
+            System.out.println("您的联系方式交换记录:");
+            for (ContactExchangeRecord record : records) {
+                System.out.println(record.toString());
             }
         }
     }
@@ -360,6 +381,15 @@ public class Main {
             if (seller != null) {
                 System.out.println("商品信息: " + product.getName());
                 System.out.println("卖家联系方式: " + seller.getContactInfo());
+                
+                // 记录联系方式交换
+                String recordId = "record_" + System.currentTimeMillis();
+                contactExchangeService.recordContactExchange(
+                    recordId, 
+                    currentUser.getUserId(), 
+                    productId, 
+                    seller.getUserId()
+                );
             } else {
                 System.out.println("未找到卖家信息");
             }

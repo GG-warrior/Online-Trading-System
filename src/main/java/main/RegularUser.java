@@ -1,8 +1,6 @@
-package main;
+package src.main.java.main;
 
-import java.io.Serializable;
-
-public class RegularUser extends User implements Serializable {
+public class RegularUser extends User {
     private static final long serialVersionUID = 1L;
     private boolean isVerified;  // 用户是否已验证
     

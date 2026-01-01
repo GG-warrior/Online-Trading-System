@@ -1,12 +1,16 @@
-package service;
+package src.main.java.service;
 
-import main.Product;
 import java.util.*;
+import java.nio.file.*;
+
+import src.main.java.main.Product;
+
 import java.io.*;
 
 public class ProductService {
     // 使用文件存储替代数据库
-    private static final String PRODUCT_FILE = "products.dat";
+    private static final Path DATA_DIR = Paths.get("src", "main", "resources");
+    private static final Path PRODUCT_FILE = DATA_DIR.resolve("products.dat");
     private Map<String, Product> products = new HashMap<>();
     private Map<String, List<String>> userProducts = new HashMap<>();
     private Map<String, List<String>> publishedProducts = new HashMap<>();
@@ -173,12 +177,18 @@ public class ProductService {
     // 保存商品数据到文件
     private void saveProductsToFile() {
         try {
+            Files.createDirectories(DATA_DIR);
+        } catch (IOException e) {
+            System.err.println("创建资源目录失败: " + e.getMessage());
+        }
+
+        try {
             Map<String, Object> data = new HashMap<>();
             data.put("products", products);
             data.put("userProducts", userProducts);
             data.put("publishedProducts", publishedProducts);
             
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(PRODUCT_FILE))) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(PRODUCT_FILE))) {
                 oos.writeObject(data);
             }
         } catch (IOException e) {
@@ -188,7 +198,7 @@ public class ProductService {
     
     // 从文件加载商品数据
     private void loadProductsFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(PRODUCT_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(PRODUCT_FILE))) {
             Map<String, Object> data = (Map<String, Object>) ois.readObject();
             products = (Map<String, Product>) data.get("products");
             userProducts = (Map<String, List<String>>) data.get("userProducts");

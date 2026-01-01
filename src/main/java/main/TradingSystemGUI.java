@@ -1,17 +1,11 @@
+package src.main.java.main;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
-import service.UserService;
-import service.ProductService;
-import service.ContactExchangeService;
-import main.User;
-import main.RegularUser;
-import main.AdminUser;
-import main.Product;
-import main.ContactExchangeRecord;
+import src.main.java.service.ContactExchangeService;
+import src.main.java.service.ProductService;
+import src.main.java.service.UserService;
 
 public class TradingSystemGUI extends JFrame {
     private UserService userService = new UserService();

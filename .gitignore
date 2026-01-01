@@ -1,41 +1,26 @@
-# Prerequisites
-*.d
+# Maven build output
+/target/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# IDE artifacts
+/.idea/
+*.iml
+*.ipr
+*.iws
+/.vscode/
+.classpath
+.project
+.settings/
+/bin/
+/out/
 
-# Precompiled Headers
-*.gch
-*.pch
+# Logs and test reports
+*.log
+/surefire-reports/
+/failsafe-reports/
 
-# Linker files
-*.ilk
+# Compiled bytecode
+*.class
 
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# OS-generated junk
+.DS_Store
+Thumbs.db

@@ -1,14 +1,18 @@
-package service;
+package src.main.java.service;
 
-import main.User;
-import main.RegularUser;
-import main.AdminUser;
 import java.util.*;
+import java.nio.file.*;
+
+import src.main.java.main.AdminUser;
+import src.main.java.main.RegularUser;
+import src.main.java.main.User;
+
 import java.io.*;
 
 public class UserService {
     // 使用文件存储替代数据库
-    private static final String USER_FILE = "users.dat";
+    private static final Path DATA_DIR = Paths.get("src", "main", "resources");
+    private static final Path USER_FILE = DATA_DIR.resolve("users.dat");
     private Map<String, User> users = new HashMap<>();
     private Map<String, RegularUser> regularUsers = new HashMap<>();
     private Map<String, AdminUser> adminUsers = new HashMap<>();
@@ -134,7 +138,13 @@ public class UserService {
     
     // 保存用户数据到文件
     private void saveUsersToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
+        try {
+            Files.createDirectories(DATA_DIR);
+        } catch (IOException e) {
+            System.err.println("创建资源目录失败: " + e.getMessage());
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(USER_FILE))) {
             oos.writeObject(users);
             oos.writeObject(regularUsers);
             oos.writeObject(adminUsers);
@@ -145,7 +155,7 @@ public class UserService {
     
     // 从文件加载用户数据
     private void loadUsersFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(USER_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(USER_FILE))) {
             users = (Map<String, User>) ois.readObject();
             regularUsers = (Map<String, RegularUser>) ois.readObject();
             adminUsers = (Map<String, AdminUser>) ois.readObject();

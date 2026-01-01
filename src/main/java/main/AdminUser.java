@@ -1,8 +1,6 @@
-package main;
+package src.main.java.main;
 
-import java.io.Serializable;
-
-public class AdminUser extends User implements Serializable {
+public class AdminUser extends User {
     private static final long serialVersionUID = 1L;
     private String adminLevel;  // 管理员级别
     

@@ -1,12 +1,16 @@
-package service;
+package src.main.java.service;
 
-import main.ContactExchangeRecord;
 import java.util.*;
+import java.nio.file.*;
+
+import src.main.java.main.ContactExchangeRecord;
+
 import java.io.*;
 
 public class ContactExchangeService implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String EXCHANGE_RECORD_FILE = "contact_exchanges.dat";
+    private static final Path DATA_DIR = Paths.get("src", "main", "resources");
+    private static final Path EXCHANGE_RECORD_FILE = DATA_DIR.resolve("contact_exchanges.dat");
     
     // 存储联系方式交换记录
     private Map<String, ContactExchangeRecord> exchangeRecords = new HashMap<>();
@@ -67,11 +71,17 @@ public class ContactExchangeService implements Serializable {
     // 保存交换记录数据到文件
     private void saveExchangeRecordsToFile() {
         try {
+            Files.createDirectories(DATA_DIR);
+        } catch (IOException e) {
+            System.err.println("创建资源目录失败: " + e.getMessage());
+        }
+
+        try {
             Map<String, Object> data = new HashMap<>();
             data.put("exchangeRecords", exchangeRecords);
             data.put("userExchangeRecords", userExchangeRecords);
             
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EXCHANGE_RECORD_FILE))) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(EXCHANGE_RECORD_FILE))) {
                 oos.writeObject(data);
             }
         } catch (IOException e) {
@@ -81,7 +91,7 @@ public class ContactExchangeService implements Serializable {
     
     // 从文件加载交换记录数据
     private void loadExchangeRecordsFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EXCHANGE_RECORD_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(EXCHANGE_RECORD_FILE))) {
             Map<String, Object> data = (Map<String, Object>) ois.readObject();
             exchangeRecords = (Map<String, ContactExchangeRecord>) data.get("exchangeRecords");
             userExchangeRecords = (Map<String, List<String>>) data.get("userExchangeRecords");

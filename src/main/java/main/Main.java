@@ -1,12 +1,13 @@
-package main;
-
-import service.UserService;
-import service.ProductService;
-import service.ContactExchangeService;
+package src.main.java.main;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import src.main.java.service.ContactExchangeService;
+import src.main.java.service.ProductService;
+import src.main.java.service.UserService;
+
 import java.util.InputMismatchException;
 
 public class Main {

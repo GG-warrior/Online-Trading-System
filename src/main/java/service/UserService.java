@@ -1,11 +1,11 @@
-package src.main.java.service;
+package service;
 
 import java.util.*;
 import java.nio.file.*;
 
-import src.main.java.main.AdminUser;
-import src.main.java.main.RegularUser;
-import src.main.java.main.User;
+import main.AdminUser;
+import main.RegularUser;
+import main.User;
 
 import java.io.*;
 

@@ -1,4 +1,4 @@
-package src.main.java.main;
+package main;
 
 public class RegularUser extends User {
     private static final long serialVersionUID = 1L;

@@ -1,12 +1,12 @@
-package src.main.java.main;
+package main;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import src.main.java.service.ContactExchangeService;
-import src.main.java.service.ProductService;
-import src.main.java.service.UserService;
+import service.ContactExchangeService;
+import service.ProductService;
+import service.UserService;
 
 import java.util.InputMismatchException;
 

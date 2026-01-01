@@ -1,9 +1,9 @@
-package src.main.java.service;
+package service;
 
 import java.util.*;
 import java.nio.file.*;
 
-import src.main.java.main.ContactExchangeRecord;
+import main.ContactExchangeRecord;
 
 import java.io.*;
 
